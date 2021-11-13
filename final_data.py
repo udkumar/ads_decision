@@ -103,8 +103,9 @@ def parse_xml(dur_second):
 						pre_transcoded.append(c_d) # [{"duration": 20,"creative_ID":12323},...]
 					else:
 						non_transcoded.append(c_d)
-					print("non..",pre_transcoded)
-					print("pre..",pre_transcoded)
+					
+					print("pre with creatives..",pre_transcoded)
+					print("non with creatives",pre_transcoded)
 
 				# TrackingEvents Started
 				if cr_node.tag =='Tracking':
@@ -193,14 +194,18 @@ def parse_xml(dur_second):
 			ads.append(ads_dic)
 			ads.append(crs_dict)
 		ads_data["ads"] = ads
+
 	pre_dur = []
 	non_dur = []
 	for pt in pre_transcoded:
 		pre_dur.append(pt["duration"])
-		print("pre..",pre_dur)
+		
 	for nt in non_transcoded:
 		non_dur.append(nt["duration"])
-		print("non..",non_dur)
+
+	# Final list to process
+	print("pre..",pre_dur)
+	print("non..",non_dur)
 
 	pre_dur_copy = copy.deepcopy(pre_dur)
 	non_dur_copy = copy.deepcopy(non_dur)
@@ -208,12 +213,14 @@ def parse_xml(dur_second):
 	pre_durations = [str(str(ele)+"p"+str(idx)) if (ele in pre_dur_copy[ :idx]) else ele for idx, ele in enumerate(pre_dur_copy)]
 	non_durations = [str(str(ele)+"n"+str(idx)) if (ele in non_dur_copy[ :idx]) else ele for idx, ele in enumerate(non_dur_copy)]
 	
+	
+
 	search_ads_data = ""
 	# search_ads_data = find_match_ads(pre_durations,dur_second)
 	search_ads_data = find_match_ads(pre_durations,non_durations,dur_second)
 	# search_ads_data = find_match_ads(non_durations,dur_second)
 
-
+subarray whos sum is 
 	print(search_ads_data)
 
 	final_creatives = []
