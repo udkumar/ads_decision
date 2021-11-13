@@ -7,9 +7,8 @@ import itertools
 
 r = redis.Redis(host='localhost', port=6379, db=0)
 
-def extract_sum(pre_combos, non_combos, user_input):
-	flag = False
-	for v in pre_combos:
+def extract_sum(combos, user_input):
+	for v in combos:
 		sum1 = 0
 		for s in v:
 			if type(s) == str:
@@ -19,39 +18,21 @@ def extract_sum(pre_combos, non_combos, user_input):
 					sum1 += int(s.split("n")[0])
 			elif type(s) == int:
 				sum1 += s
-		print("pre...sum..",sum1)
+		print(sum1)
 		if sum1 == user_input:
-			flag = True
 			return v, sum1
 
-	if flag == False:
-		for v in non_combos:
-			sum1 = 0
-			for s in v:
-				if type(s) == str:
-					if "p" in s:
-						sum1 += int(s.split("p")[0])
-					else:
-						sum1 += int(s.split("n")[0])
-				elif type(s) == int:
-					sum1 += s
-			print("non...sum..",sum1)
-			if sum1 == user_input:
-				return v, sum1
 
-# isolation+big_data+partining
-
-def find_match_ads(pre_durations, user_input):
+def find_match_ads(pre_durations, non_durations, user_input):
 	search_ads_data = []
 	pre_combos = set([combo for length in range(1, len(pre_durations)) for combo in itertools.combinations(pre_durations, length)])
 	# non_combos = set([combo for length in range(1, len(non_durations)) for combo in itertools.combinations(non_durations, length)])
 
 	comb, sum = extract_sum(pre_combos, user_input)
-		
+
 	for f in comb:
-		print(f)
 		if type(f) == int:
-			found_index = durations.index(f)
+			found_index = pre_durations.index(f)
 			search_ads_data.append(found_index) #ads
 		elif type(f) == str:
 			if "p" in f:
@@ -122,6 +103,8 @@ def parse_xml(dur_second):
 						pre_transcoded.append(c_d) # [{"duration": 20,"creative_ID":12323},...]
 					else:
 						non_transcoded.append(c_d)
+					print("non..",pre_transcoded)
+					print("pre..",pre_transcoded)
 
 				# TrackingEvents Started
 				if cr_node.tag =='Tracking':
@@ -214,10 +197,10 @@ def parse_xml(dur_second):
 	non_dur = []
 	for pt in pre_transcoded:
 		pre_dur.append(pt["duration"])
+		print("pre..",pre_dur)
 	for nt in non_transcoded:
 		non_dur.append(nt["duration"])
-
-	print(pre_dur,non_dur)
+		print("non..",non_dur)
 
 	pre_dur_copy = copy.deepcopy(pre_dur)
 	non_dur_copy = copy.deepcopy(non_dur)
@@ -229,12 +212,14 @@ def parse_xml(dur_second):
 	# search_ads_data = find_match_ads(pre_durations,dur_second)
 	search_ads_data = find_match_ads(pre_durations,non_durations,dur_second)
 	# search_ads_data = find_match_ads(non_durations,dur_second)
+
+
 	print(search_ads_data)
 
-	# final_creatives = []
-	# for fc in search_ads_data:
-	# 	final_creatives.append(pre_transcoded[fc])
-	# print("pre...: ",final_creatives)
+	final_creatives = []
+	for fc in search_ads_data:
+		final_creatives.append(pre_transcoded[fc])
+	print("pre...: ",final_creatives)
 
 user_input = int(input("Enter ads duration: "))
 parse_xml(user_input)
